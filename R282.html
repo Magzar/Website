@@ -16,6 +16,70 @@
     </nav>
   </header>
 
+<canvas id="ballCanvas" width="800" height="400" style="border:1px solid #00ffaa; background:#111;"></canvas>
+<script>
+const canvas = document.getElementById('ballCanvas');
+const ctx = canvas.getContext('2d');
+
+let x = 50;          // Ball x position
+let y = 50;          // Ball y position
+let radius = 20;     // Ball radius
+let vx = 4;          // Horizontal speed
+let vy = 0;          // Vertical speed
+let gravity = 0.5;   // Gravity acceleration
+let bounce = -0.7;   // Bounce factor
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Draw ball
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI*2);
+  ctx.fillStyle = "red";
+  ctx.fill();
+  ctx.closePath();
+}
+
+function update() {
+  // Horizontal movement
+  x += vx;
+
+  // Vertical movement (gravity)
+  vy += gravity;
+  y += vy;
+
+  // Bounce off floor
+  if(y + radius > canvas.height) {
+    y = canvas.height - radius;
+    vy *= bounce;
+  }
+
+  // Bounce off ceiling
+  if(y - radius < 0) {
+    y = radius;
+    vy *= bounce;
+  }
+
+  // Bounce off walls
+  if(x + radius > canvas.width) {
+    x = canvas.width - radius;
+    vx *= -1;
+  }
+  if(x - radius < 0) {
+    x = radius;
+    vx *= -1;
+  }
+}
+
+function loop() {
+  draw();
+  update();
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+
   <main>
     <section class="intro">
       <h>Umm I need a loco. Epic ball reference</h>
