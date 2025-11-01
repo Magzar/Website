@@ -97,6 +97,27 @@ section h2 {
   color: #c9d1d9;
 }
 
+/* Card front normally on top */
+.card-front {
+  z-index: 2;
+}
+
+/* Card back hidden under */
+.card-back {
+  top: 120px; /* positioned below card initially */
+  z-index: 1;
+}
+
+/* Hover effect */
+.card:hover .card-front {
+  transform: translateY(-150px); /* raise card a lot */
+  z-index: 3;
+}
+
+.card:hover .card-back {
+  top: 0; /* move hidden content up */
+}
+
 /* ========= DATA TABLES ========= */
 table {
   width: 100%;
