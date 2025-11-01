@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magzar | SCR</title>
+  <link rel="stylesheet" href="serverstyles.css">
+</head>
+<body>
+  <header>
+  <h1><a href="index.html">Magzar</a></h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="scr.html">SCR</a>
+      <a href="csa.html">CSA</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Just an Overview</h2>
+      <div class="card-container">
+        <div class="card">
+          <h3>My department:</h3>
+          <p>QD</p>
+        </div>
+        <div class="card">
+          <h3>Supervisor since</h3>
+          <p id="supervisor-since"></p>
+            <script>
+            const startDate = new Date("04/04/2025");
+            const now = new Date();
+
+            const years = now.getFullYear() - startDate.getFullYear();
+            const months = now.getMonth() - startDate.getMonth();
+
+            let yearText = years > 0 ? `${years} year${years > 1 ? "s" : ""}` : "";
+            let monthText = months > 0 ? `${months} month${months > 1 ? "s" : ""}` : "";
+
+            const options = { year: "numeric", month: "long", day: "numeric" };
+            const formatted = startDate.toLocaleDateString("en-GB", options);
+
+            document.getElementById("supervisor-since").textContent =
+                `Supervisor since ${formatted} (${yearText}${yearText && monthText ? ", " : ""}${monthText} ago)`;
+            </script>
+        </div>
+      </div>
+      <div class="card-container">
+        <div class="card">
+          <h3>Trainings hosted</h3>
+          <p id="hosted-trainings"></p>
+        </div>
+        <div class="card">
+          <h3>Trainings cohosted</h3>
+          <p id="cohosted-trainings"></p>
+        </div>
+        <div class="card">
+          <h3>Trainings attended</h3>
+          <p id="attended-trainings"></p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Training Stats</h2>
+        <table id="training-table"></table>
+    </section>
+
+    <script>
+        const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQkszfsQMoVh-LMG19G60dxRqjVa2rdjHfJe-fMXGMVXJe-wysXMtlej0yui6VUsuIcEeNehMER_feq/pub?gid=0&single=true&output=csv";
+
+        fetch(sheetURL)
+        .then(r => r.text())
+        .then(csv => {
+            const rows = csv.trim().split("\n").map(r => r.split(","));
+            const normalRows = rows.slice(0, -3);
+            const totalRows = rows.slice(-3);
+
+            // build the main table
+            document.getElementById("training-table").innerHTML = normalRows
+            .map((row, i) =>
+                `<tr>${row.map(cell => `<${i === 0 ? 'th' : 'td'}>${cell}</${i === 0 ? 'th' : 'td'}>`).join("")}</tr>`
+            )
+            .join("");
+
+            // Each total into its own element
+            document.getElementById("hosted-trainings").textContent = totalRows[0][1];
+            document.getElementById("cohosted-trainings").textContent = totalRows[1][1];
+            document.getElementById("attended-trainings").textContent = totalRows[2][1];
+        });
+    </script>
+  </main>
+
+  <footer>
+    <p>2025 - All rights reserved!</p>
+  </footer>
+</body>
+</html>
