@@ -3,24 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Magzar | SCR</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <header>
-  <h1><a href="index.html">Magzar</a></h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="scr.html">SCR</a>
-      <a href="csa.html">CSA</a>
-    </nav>
-  </header>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Magzar | Signalling Simulator</title>
   <link rel="stylesheet" href="serverstyles.css">
 </head>
@@ -34,9 +16,10 @@
         <a href="csa.html">CSA</a>
         </nav>
     </header>
+
 <h2>Mini Train Signaling Simulator</h2>
 <p class="instruction">Click signals to toggle red/green and let trains pass safely.</p>
-<canvas id="train-canvas" width="600" height="300"></canvas>
+<canvas id="train-canvas" width="800" height="400"></canvas>
 <p id="score">Score: 0</p>
 
 <script>
@@ -44,19 +27,23 @@ const canvas = document.getElementById("train-canvas");
 const ctx = canvas.getContext("2d");
 
 let score = 0;
+let gameOver = false;
 
-// Tracks and signals
+// Tracks, stations, and signals
 const tracks = [
-  { y: 50, signals: [{x: 200, color: 'red'}] },
-  { y: 150, signals: [{x: 300, color: 'red'}] },
-  { y: 250, signals: [{x: 400, color: 'red'}] }
+  { y: 80, stations: [200, 400, 600], signals: [180, 380, 580] },
+  { y: 180, stations: [150, 350, 550], signals: [130, 330, 530] },
+  { y: 280, stations: [100, 300, 500, 700], signals: [80, 280, 480, 680] }
 ];
+
+// Junction (tracks 0 and 1 cross at x=500)
+const junction = { x: 500, tracks: [0,1], occupied: false };
 
 // Trains
 let trains = [
   { x: 0, y: tracks[0].y, speed: 2, stopped: false },
-  { x: -150, y: tracks[1].y, speed: 2.5, stopped: false },
-  { x: -300, y: tracks[2].y, speed: 3, stopped: false }
+  { x: -200, y: tracks[1].y, speed: 2.5, stopped: false },
+  { x: -400, y: tracks[2].y, speed: 3, stopped: false }
 ];
 
 // Draw everything
@@ -72,61 +59,110 @@ function draw() {
     ctx.lineTo(canvas.width, track.y);
     ctx.stroke();
 
+    // Draw stations
+    track.stations.forEach(st => {
+      ctx.fillStyle = "#333";
+      ctx.fillRect(st-15, track.y-15, 30, 30);
+      ctx.strokeStyle = "#00ffaa";
+      ctx.strokeRect(st-15, track.y-15, 30, 30);
+    });
+
     // Draw signals
-    track.signals.forEach(signal => {
-      ctx.fillStyle = signal.color;
+    track.signals.forEach(sig => {
+      ctx.fillStyle = "red";
       ctx.beginPath();
-      ctx.arc(signal.x, track.y, 10, 0, Math.PI * 2);
+      ctx.arc(sig, track.y, 10, 0, Math.PI*2);
       ctx.fill();
-      // optional glow
-      ctx.shadowColor = signal.color;
+      ctx.shadowColor = ctx.fillStyle;
       ctx.shadowBlur = 8;
       ctx.fill();
       ctx.shadowBlur = 0;
     });
   });
 
+  // Draw junction
+  ctx.fillStyle = "#666";
+  ctx.fillRect(junction.x-20, tracks[0].y-3, 40, tracks[1].y-tracks[0].y+6);
+
   // Draw trains
   trains.forEach(train => {
     ctx.fillStyle = "orange";
-    ctx.fillRect(train.x, train.y - 10, 30, 20);
+    ctx.fillRect(train.x, train.y-10, 30, 20);
   });
 }
 
 // Update train positions
 function update() {
+  if (gameOver) return;
+
   trains.forEach((train, idx) => {
     const track = tracks[idx];
-    const signal = track.signals[0];
-    if (train.x + 30 >= signal.x && signal.color === 'red') {
-      train.stopped = true;
-    } else {
-      train.stopped = false;
+    train.stopped = false;
+
+    // Stop if reaching red signal
+    track.signals.forEach(sig => {
+      if (train.x + 30 >= sig && train.x <= sig + 5) {
+        train.stopped = true;
+      }
+    });
+
+    // Stop if reaching occupied junction
+    if (junction.tracks.includes(idx)) {
+      if (train.x + 30 >= junction.x && train.x <= junction.x + 40) {
+        if (junction.occupied && junction.currentTrain !== idx) {
+          train.stopped = true;
+        } else {
+          junction.occupied = true;
+          junction.currentTrain = idx;
+        }
+      } else if (train.x > junction.x + 40 && junction.currentTrain === idx) {
+        junction.occupied = false;
+        junction.currentTrain = null;
+      }
     }
 
     if (!train.stopped) train.x += train.speed;
 
+    // Collision detection
+    trains.forEach((other, j) => {
+      if (idx !== j && Math.abs(train.x - other.x) < 30 && train.y === other.y) {
+        gameOver = true;
+        alert("🚨 Collision! Game Over. Final Score: " + score);
+      }
+    });
+
+    // Check station pass
+    track.stations.forEach(st => {
+      if (train.x > st && !train.passedStations) train.passedStations = {};
+      if (!train.passedStations[st] && train.x > st) {
+        score += 1;
+        train.passedStations[st] = true;
+        document.getElementById("score").textContent = "Score: " + score;
+      }
+    });
+
     // Loop trains
     if (train.x > canvas.width) {
       train.x = -50;
-      score += 1;
-      document.getElementById("score").textContent = "Score: " + score;
+      train.passedStations = {};
     }
   });
 }
 
-// Handle signal clicks
+// Click signals to toggle
 canvas.addEventListener("click", (e) => {
   const rect = canvas.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
 
   tracks.forEach(track => {
-    track.signals.forEach(signal => {
-      const dx = mouseX - signal.x;
-      const dy = mouseY - track.y;
+    track.signals.forEach((sig, i) => {
+      const dx = mx - sig;
+      const dy = my - track.y;
       if (Math.sqrt(dx*dx + dy*dy) < 15) {
-        signal.color = signal.color === 'red' ? 'green' : 'red';
+        // toggle red/green
+        const color = ctx.fillStyle === 'green' ? 'red' : 'green';
+        ctx.fillStyle = color;
       }
     });
   });
@@ -141,8 +177,6 @@ function loop() {
 
 loop();
 </script>
-<footer>
-    <p>2025 - All rights reserved!</p>
-  </footer>
+
 </body>
 </html>
