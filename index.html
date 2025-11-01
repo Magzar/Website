@@ -22,7 +22,24 @@
       <p>Hello! I’m <strong>Magzar or bagg130, or bagg, or bagginton, or whatever you want to call me</strong> — just a supervisor in SCR, and a staff in CSA and SCRST.
       I also enjoy programming (python, and just started javascript), but I am not the best at it.</p>
 
-      <a href="archive.html" class="mystery-link">Explore More</a>
+      <button id="explore-btn", class="mystery-link">A Mystery Site</button>
+      <script>
+            // List of possible pages to visit
+            const pages = [
+              "scr.html",
+              "index.html",
+              "csa.html",
+              "halloween.html",
+            ];
+
+            // Button click event
+            document.getElementById("explore-btn").addEventListener("click", () => {
+              // Pick a random page from the list
+              const randomPage = pages[Math.floor(Math.random() * pages.length)];
+              // Navigate there
+              window.location.href = randomPage;
+            });
+          </script>
     </section>
   </main>
 
