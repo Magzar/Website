@@ -45,6 +45,13 @@ function draw() {
   ctx.fillStyle = "red";
   ctx.fill();
   ctx.closePath();
+
+// Draw text centered
+  ctx.fillStyle = "#fff"; // text color
+  ctx.font = "20px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("The Epic Ball", x, y); // text on the ball
 }
 
 function update() {
@@ -87,7 +94,7 @@ loop();
 
   <main>
     <section class="intro">
-      <h>Umm I need a loco. Epic ball reference</h>
+      <h>Someone stole my loco, I need a new loco please help. Epic ball knowledge.</h>
     </section>
   </main>
 
