@@ -67,23 +67,23 @@ main {
 .mystery-link {
   display: inline-block;
   margin-top: 30px;
-  padding: 14px 32px; /* bigger padding for a larger button */
-  color: #00ffaa;
-  border: 2px solid #00ffaa; /* slightly thicker for visibility */
+  padding: 14px 32px;           /* bigger, more clickable */
+  color: #00ffaa;               /* text color */
+  border: 2px solid #00ffaa;    /* neon border */
   border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
   font-family: "Consolas", monospace;
   letter-spacing: 0.5px;
+  background-color: #111;       /* dark background, not white */
+  box-shadow: 0 0 6px rgba(0, 255, 170, 0.5);
   transition: all 0.3s ease;
-  background-color: #111; /* dark background makes the neon pop */
-  box-shadow: 0 0 6px rgba(0, 255, 170, 0.5); /* subtle glow */
 }
 
 .mystery-link:hover {
-  color: #111; /* invert text on hover */
-  background-color: #00ffaa; /* neon fills background */
-  box-shadow: 0 0 16px rgba(0, 255, 170, 0.8); /* stronger glow */
+  color: #111;                  /* invert text on hover */
+  background-color: #00ffaa;    /* neon fills background */
+  box-shadow: 0 0 16px rgba(0, 255, 170, 0.8);
   transform: scale(1.05);
 }
 
