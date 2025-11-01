@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magzar | SCR</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+  <h1><a href="index.html">Magzar</a></h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="scr.html">SCR</a>
+      <a href="csa.html">CSA</a>
+    </nav>
+  </header>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magzar | Signalling Simulator</title>
+  <link rel="stylesheet" href="serverstyles.css">
+</head>
+<body>
+
+    <header>
+      <h1><a href="index.html">Magzar</a></h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="scr.html">SCR</a>
+        <a href="csa.html">CSA</a>
+        </nav>
+    </header>
+<h2>Mini Train Signaling Simulator</h2>
+<p class="instruction">Click signals to toggle red/green and let trains pass safely.</p>
+<canvas id="train-canvas" width="600" height="300"></canvas>
+<p id="score">Score: 0</p>
+
+<script>
+const canvas = document.getElementById("train-canvas");
+const ctx = canvas.getContext("2d");
+
+let score = 0;
+
+// Tracks and signals
+const tracks = [
+  { y: 50, signals: [{x: 200, color: 'red'}] },
+  { y: 150, signals: [{x: 300, color: 'red'}] },
+  { y: 250, signals: [{x: 400, color: 'red'}] }
+];
+
+// Trains
+let trains = [
+  { x: 0, y: tracks[0].y, speed: 2, stopped: false },
+  { x: -150, y: tracks[1].y, speed: 2.5, stopped: false },
+  { x: -300, y: tracks[2].y, speed: 3, stopped: false }
+];
+
+// Draw everything
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw tracks
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 6;
+  tracks.forEach(track => {
+    ctx.beginPath();
+    ctx.moveTo(0, track.y);
+    ctx.lineTo(canvas.width, track.y);
+    ctx.stroke();
+
+    // Draw signals
+    track.signals.forEach(signal => {
+      ctx.fillStyle = signal.color;
+      ctx.beginPath();
+      ctx.arc(signal.x, track.y, 10, 0, Math.PI * 2);
+      ctx.fill();
+      // optional glow
+      ctx.shadowColor = signal.color;
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+  });
+
+  // Draw trains
+  trains.forEach(train => {
+    ctx.fillStyle = "orange";
+    ctx.fillRect(train.x, train.y - 10, 30, 20);
+  });
+}
+
+// Update train positions
+function update() {
+  trains.forEach((train, idx) => {
+    const track = tracks[idx];
+    const signal = track.signals[0];
+    if (train.x + 30 >= signal.x && signal.color === 'red') {
+      train.stopped = true;
+    } else {
+      train.stopped = false;
+    }
+
+    if (!train.stopped) train.x += train.speed;
+
+    // Loop trains
+    if (train.x > canvas.width) {
+      train.x = -50;
+      score += 1;
+      document.getElementById("score").textContent = "Score: " + score;
+    }
+  });
+}
+
+// Handle signal clicks
+canvas.addEventListener("click", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+
+  tracks.forEach(track => {
+    track.signals.forEach(signal => {
+      const dx = mouseX - signal.x;
+      const dy = mouseY - track.y;
+      if (Math.sqrt(dx*dx + dy*dy) < 15) {
+        signal.color = signal.color === 'red' ? 'green' : 'red';
+      }
+    });
+  });
+});
+
+// Game loop
+function loop() {
+  draw();
+  update();
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+<footer>
+    <p>2025 - All rights reserved!</p>
+  </footer>
+</body>
+</html>

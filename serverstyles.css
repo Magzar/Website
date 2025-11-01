@@ -132,3 +132,24 @@ footer {
   border-top: 1px solid #222;
   font-size: 0.9rem;
 }
+
+
+/* Signalling */
+
+#train-canvas {
+  border: 2px solid #444;
+  background-color: #111; /* dark, like Discord theme */
+  display: block;
+  margin: 20px auto;
+}
+
+#score {
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+.instruction {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  color: #88ffcc;
+}
