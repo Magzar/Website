@@ -110,3 +110,8 @@ footer {
   z-index: 0; /* behind content */
   background: #111;
 }
+
+header, main, footer {
+  position: relative;
+  z-index: 1; /* higher than canvas */
+}
