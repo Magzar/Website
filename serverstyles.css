@@ -97,40 +97,6 @@ section h2 {
   color: #c9d1d9;
 }
 
-.card-front, .card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-  color: #00ffaa;
-  background-color: #111;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: transform 0.5s ease, top 0.5s ease;
-}
-/* Card front normally on top */
-.card-front {
-  z-index: 2;
-}
-
-/* Card back hidden under */
-.card-back {
-  top: 120px; /* positioned below card initially */
-  z-index: 1;
-}
-
-/* Hover effect */
-.card:hover .card-front {
-  transform: translateY(-150px); /* raise card a lot */
-  z-index: 3;
-}
-
-.card:hover .card-back {
-  top: 0; /* move hidden content up */
-}
-
 /* ========= DATA TABLES ========= */
 table {
   width: 100%;
