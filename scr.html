@@ -69,31 +69,24 @@
         const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQkszfsQMoVh-LMG19G60dxRqjVa2rdjHfJe-fMXGMVXJe-wysXMtlej0yui6VUsuIcEeNehMER_feq/pub?gid=0&single=true&output=csv";
 
         fetch(sheetURL)
-          .then(r => r.text())
-          .then(csv => {
-            const rows = csv.split("\n").map(r => r.split(","));
-            const table = document.getElementById("training-table");
+        .then(r => r.text())
+        .then(csv => {
+            const rows = csv.trim().split("\n").map(r => r.split(","));
+            const normalRows = rows.slice(0, -3);
+            const totalRows = rows.slice(-3);
 
-            table.innerHTML = rows
-              .map((row, i) => 
-                `<tr>${row.map(cell => {
-                  const tag = i === 0 ? 'th' : 'td';
-                  const color = getCellColor(cell.trim());
-                  return `<${tag} style="color:${color}">${cell}</${tag}>`;
-                }).join("")}</tr>`
-              )
-              .join("");
-          });
+            // build the main table
+            document.getElementById("training-table").innerHTML = normalRows
+            .map((row, i) =>
+                `<tr>${row.map(cell => `<${i === 0 ? 'th' : 'td'}>${cell}</${i === 0 ? 'th' : 'td'}>`).join("")}</tr>`
+            )
+            .join("");
 
-        function getCellColor(cellText) {
-          switch (cellText) {
-            case "QD": return "red";
-            case "DS": return "orange";
-            case "GD": return "blue";
-            case "SG": return "green";
-            default: return "inherit";
-          }
-        }
+            // Each total into its own element
+            document.getElementById("hosted-trainings").textContent = totalRows[0][1];
+            document.getElementById("cohosted-trainings").textContent = totalRows[1][1];
+            document.getElementById("attended-trainings").textContent = totalRows[2][1];
+        });
     </script>
   </main>
 
