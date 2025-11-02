@@ -67,26 +67,55 @@
 
     <script>
         const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQkszfsQMoVh-LMG19G60dxRqjVa2rdjHfJe-fMXGMVXJe-wysXMtlej0yui6VUsuIcEeNehMER_feq/pub?gid=0&single=true&output=csv";
+      const CACHE_DURATION =  60 * 60 * 1000; // one hour
 
-        fetch(sheetURL)
-        .then(r => r.text())
-        .then(csv => {
-            const rows = csv.trim().split("\n").map(r => r.split(","));
-            const normalRows = rows.slice(0, -3);
-            const totalRows = rows.slice(-3);
+      function fetchSheet() {
+          fetch(sheetURL)
+              .then(r => r.text())
+              .then(csv => {
+                  // Save CSV and timestamp
+                  localStorage.setItem("trainingCSV", csv);
+                  localStorage.setItem("trainingCSV_time", Date.now());
+                  processCSV(csv);
+              })
+              .catch(() => {
+                  console.warn("Fetch failed, using cache if available");
+                  useCacheIfAvailable();
+              });
+      }
 
-            // build the main table
-            document.getElementById("training-table").innerHTML = normalRows
-            .map((row, i) =>
-                `<tr>${row.map(cell => `<${i === 0 ? 'th' : 'td'}>${cell}</${i === 0 ? 'th' : 'td'}>`).join("")}</tr>`
-            )
-            .join("");
+      function useCacheIfAvailable() {
+          const cachedCSV = localStorage.getItem("trainingCSV");
+          const savedTime = parseInt(localStorage.getItem("trainingCSV_time"), 10);
 
-            // Each total into its own element
-            document.getElementById("hosted-trainings").textContent = totalRows[0][1];
-            document.getElementById("cohosted-trainings").textContent = totalRows[1][1];
-            document.getElementById("attended-trainings").textContent = totalRows[2][1];
-        });
+          if (cachedCSV && savedTime && (Date.now() - savedTime < CACHE_DURATION)) {
+              processCSV(cachedCSV);
+          } else {
+              console.error("No valid cached data available");
+          }
+      }
+
+      function processCSV(csv) {
+          const rows = csv.trim().split("\n").map(r => r.split(","));
+          const normalRows = rows.slice(0, -3);
+          const totalRows = rows.slice(-3);
+
+          document.getElementById("training-table").innerHTML = normalRows
+              .map((row, i) =>
+                  `<tr>${row.map(cell => `<${i === 0 ? 'th' : 'td'}>${cell}</${i === 0 ? 'th' : 'td'}>`).join("")}</tr>`
+              )
+              .join("");
+
+          document.getElementById("hosted-trainings").textContent = totalRows[0][1];
+          document.getElementById("cohosted-trainings").textContent = totalRows[1][1];
+          document.getElementById("attended-trainings").textContent = totalRows[2][1];
+      }
+
+      // Check cache first
+      useCacheIfAvailable();
+
+      // Always try to fetch a fresh version
+      fetchSheet();
     </script>
   </main>
 
