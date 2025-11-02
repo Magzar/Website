@@ -68,21 +68,21 @@
         canvas.addEventListener('mousemove', e => {
         if (!drawing) return;
 
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(e.offsetX, e.offsetY);
-
         if(mode === 'pen') {
-            ctx.strokeStyle = '#00ffaa'; // neon pen
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.strokeStyle = '#00ffaa';
             ctx.lineWidth = 4;
-        } else {
-            ctx.strokeStyle = '#161b22'; // erase to background
-            ctx.lineWidth = 40;
+            ctx.stroke();
+        } else { // eraser
+            const eraserSize = 20;
+            ctx.clearRect(e.offsetX - eraserSize/2, e.offsetY - eraserSize/2, eraserSize, eraserSize);
         }
 
-        ctx.stroke();
         [lastX, lastY] = [e.offsetX, e.offsetY];
         });
+
 
         // Save drawing
         document.getElementById('saveBtn').addEventListener('click', () => {
