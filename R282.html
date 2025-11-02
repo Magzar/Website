@@ -35,8 +35,8 @@
     let radius = 100;
     let vx = 4;
     let vy = 0;
-    let gravity = 0.2;
-    let bounce = -0.8;
+    let gravity = 0.3;
+    let bounce = -0.5;
 
     // Dragging
     let isDragging = false;
@@ -84,11 +84,6 @@
     if (isDragging) {
         isDragging = false;
     }
-    });
-
-
-    canvas.addEventListener('mouseleave', () => {
-    isDragging = false;
     });
 
     function draw() {
