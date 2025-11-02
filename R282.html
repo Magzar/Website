@@ -16,81 +16,126 @@
     </nav>
   </header>
 
-<canvas id="ballCanvas" width="800" height="400" style="border:1px solid #00ffaa; background:#111;"></canvas>
+<canvas id="ballCanvas" width="800" height="400"></canvas>
 <script>
-const canvas = document.getElementById('ballCanvas');
-const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById('ballCanvas');
+    const ctx = canvas.getContext('2d');
 
-// Make canvas fill the window
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
+    // Make canvas fill the window
+    function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-// Ball properties
-let x = 50;
-let y = 50;
-let radius = 100;
-let vx = 4;
-let vy = 0;
-let gravity = 0.2;
-let bounce = -0.8;
+    // Ball properties
+    let x = 50;
+    let y = 50;
+    let radius = 100;
+    let vx = 4;
+    let vy = 0;
+    let gravity = 0.2;
+    let bounce = -0.8;
 
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, Math.PI*2);
-  ctx.fillStyle = "red";
-  ctx.fill();
-  ctx.closePath();
+    // Dragging
+    let isDragging = false;
+    let offsetX, offsetY;
 
-// Draw text centered
-  ctx.fillStyle = "#fff"; // text color
-  ctx.font = "20px Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("The Elite Ball", x, y); // text on the ball
-}
+    canvas.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
 
-function update() {
-  x += vx;
-  vy += gravity;
-  y += vy;
+    // Check if the click is inside the ball
+    const dx = mouseX - x;
+    const dy = mouseY - y;
+    if (dx * dx + dy * dy <= radius * radius) {
+        isDragging = true;
+        offsetX = dx;
+        offsetY = dy;
+        // Stop ball motion while dragging
+        vx = 0;
+        vy = 0;
+    }
+    });
 
-  // Bounce off floor
-  if (y + radius > canvas.height) {
-    y = canvas.height - radius;
-    vy *= bounce;
-  }
+    canvas.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+        const rect = canvas.getBoundingClientRect();
+        x = e.clientX - rect.left - offsetX;
+        y = e.clientY - rect.top - offsetY;
+    }
+    });
 
-  // Bounce off ceiling
-  if (y - radius < 0) {
-    y = radius;
-    vy *= bounce;
-  }
+    canvas.addEventListener('mouseup', () => {
+    if (isDragging) {
+        isDragging = false;
+        // Optionally, resume motion with small random velocity
+        vx = 4 * (Math.random() > 0.5 ? 1 : -1);
+        vy = 0;
+    }
+    });
 
-  // Bounce off walls
-  if (x + radius > canvas.width) {
-    x = canvas.width - radius;
-    vx *= -1;
-  }
-  if (x - radius < 0) {
-    x = radius;
-    vx *= -1;
-  }
-}
+    canvas.addEventListener('mouseleave', () => {
+    isDragging = false;
+    });
 
-function loop() {
-  draw();
-  update();
-  requestAnimationFrame(loop);
-}
+    function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI*2);
+    ctx.fillStyle = "red";
+    ctx.fill();
+    ctx.closePath();
 
-loop();
+    // Draw text centered
+    ctx.fillStyle = "#fff"; // text color
+    ctx.font = "20px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("The Elite Ball", x, y); // text on the ball
+    }
 
+    function update() {
+    if (!isDragging) { // Only update physics when not dragging
+        x += vx;
+        vy += gravity;
+        y += vy;
+
+        // Bounce off floor
+        if (y + radius > canvas.height) {
+        y = canvas.height - radius;
+        vy *= bounce;
+        }
+
+        // Bounce off ceiling
+        if (y - radius < 0) {
+        y = radius;
+        vy *= bounce;
+        }
+
+        // Bounce off walls
+        if (x + radius > canvas.width) {
+        x = canvas.width - radius;
+        vx *= -1;
+        }
+        if (x - radius < 0) {
+        x = radius;
+        vx *= -1;
+        }
+    }
+    }
+
+    function loop() {
+    draw();
+    update();
+    requestAnimationFrame(loop);
+    }
+
+    loop();
 </script>
+
 
   <main>
     <section class="intro">
