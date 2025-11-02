@@ -74,7 +74,7 @@
               .then(r => r.text())
               .then(csv => {
                   // Save CSV and timestamp
-                  localStorage.setItem("csaCSV_time", csv);
+                  localStorage.setItem("csaCSV", csv);
                   localStorage.setItem("csaCSV_time", Date.now());
                   processCSV(csv);
               })
@@ -85,7 +85,7 @@
       }
 
       function useCacheIfAvailable() {
-          const cachedCSV = localStorage.getItem("csaCSV_time");
+          const cachedCSV = localStorage.getItem("csaCSV");
           const savedTime = parseInt(localStorage.getItem("csaCSV_time"), 10);
 
           if (cachedCSV && savedTime && (Date.now() - savedTime < CACHE_DURATION)) {
