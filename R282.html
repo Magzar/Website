@@ -41,41 +41,51 @@
     // Dragging
     let isDragging = false;
     let offsetX, offsetY;
+    let prevMouseX, prevMouseY;
 
     canvas.addEventListener('mousedown', (e) => {
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // Check if the click is inside the ball
     const dx = mouseX - x;
     const dy = mouseY - y;
-    if (dx * dx + dy * dy <= radius * radius) {
+    if (dx*dx + dy*dy <= radius*radius) {
         isDragging = true;
         offsetX = dx;
         offsetY = dy;
-        // Stop ball motion while dragging
+        prevMouseX = mouseX;
+        prevMouseY = mouseY;
         vx = 0;
         vy = 0;
     }
     });
 
-    canvas.addEventListener('mousemove', (e) => {
+    // Listen on the whole document to avoid letting go when leaving canvas
+    document.addEventListener('mousemove', (e) => {
     if (isDragging) {
         const rect = canvas.getBoundingClientRect();
-        x = e.clientX - rect.left - offsetX;
-        y = e.clientY - rect.top - offsetY;
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        // Calculate velocity based on mouse movement
+        vx = mouseX - prevMouseX;
+        vy = mouseY - prevMouseY;
+
+        x = mouseX - offsetX;
+        y = mouseY - offsetY;
+
+        prevMouseX = mouseX;
+        prevMouseY = mouseY;
     }
     });
 
-    canvas.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', () => {
     if (isDragging) {
         isDragging = false;
-        // Optionally, resume motion with small random velocity
-        vx = 4 * (Math.random() > 0.5 ? 1 : -1);
-        vy = 0;
     }
     });
+
 
     canvas.addEventListener('mouseleave', () => {
     isDragging = false;
